@@ -1,17 +1,28 @@
-on: push
-name: deploy
+name: Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-    deploy:
-      name: deploy to cluster 
-      runs-on: ubuntu-latest 
-      steps:
-        - uses: actions/checkout@master
-        - name: build and push to docker
-          uses: docker/build-push-action@v1 
-          with:
-            username: ${{secrets. DOCKER_USERNAME}}
-            password: ${{secrets.DOCKER_PASSWORD}}
-            repository: ${{github.repository}}
-            tag_with_ref: true
-            tag_with_sha: true
-            tags: ${{ github.sha }}
+  deploy:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build y push de la imagen
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: fernandodelgado26/dockerclass:latest
